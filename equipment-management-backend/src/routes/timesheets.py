@@ -123,8 +123,8 @@ def create_timesheet():
     month_year is 'YYYY-MM-01' (first day of month).
 
     In v1, any logged-in user (you as PMV/admin) can create a timesheet.
-    We do not assign a specific approver_user_id yet; any Site Engineer
-    can approve later.
+    We record current_user.user_id as approver_user_id to satisfy the
+    NOT NULL constraint; Site Engineers can still use the UI to approve.
     """
     data = request.get_json() or {}
     equipment_id = data.get("equipment_id")
@@ -166,12 +166,12 @@ def create_timesheet():
         db.session.flush()
 
         # Single-level approval: Site Engineer.
-        # We do NOT fix approver_user_id here; any Site Engineer can approve in v1.
+        # Use the creator's user_id to satisfy NOT NULL on approver_user_id.
         approval = TimesheetApproval(
             timesheet_id=ts.timesheet_id,
             level=1,
             role="SiteEngineer",
-            approver_user_id=None,
+            approver_user_id=current_user.user_id,
             status="pending",
         )
         db.session.add(approval)
@@ -296,7 +296,7 @@ def submit_timesheet(timesheet_id: int):
 def list_pending_for_site_engineer():
     """
     List all timesheets that are submitted and waiting for Site Engineer approval.
-    In v1, we don't restrict by approver_user_id; any Site Engineer can see them.
+    In v1 we simply show those with pending approval.
     """
     approvals = TimesheetApproval.query.filter_by(
         level=1, role="SiteEngineer", status="pending"
@@ -325,10 +325,8 @@ def approve_timesheet(timesheet_id: int):
     if not approval:
         return jsonify({"error": "Approval record not found"}), 400
 
-    # Only enforce approver_user_id when explicitly set.
-    if approval.approver_user_id and approval.approver_user_id != current_user.user_id:
-        return jsonify({"error": "Not authorized for approval"}), 403
-
+    # In v1, we do not strictly enforce approver_user_id,
+    # since approver_user_id is set to the creator just to satisfy NOT NULL.
     approval.status = "approved"
     approval.comment = comment
     approval.acted_at = datetime.utcnow()
