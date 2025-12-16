@@ -105,7 +105,9 @@ def _serialize_timesheet(ts: Timesheet):
             "status": approval.status if approval else None,
             "role": approval.role if approval else None,
             "comment": approval.comment if approval else None,
-            "acted_at": approval.acted_at.isoformat() if approval and approval.acted_at else None,
+            "acted_at": approval.acted_at.isoformat()
+            if approval and approval.acted_at
+            else None,
             "approver_user_id": approval.approver_user_id if approval else None,
         }
         if approval
@@ -119,6 +121,10 @@ def create_timesheet():
     """
     Create (or fetch) a timesheet for given equipment, driver, month_year.
     month_year is 'YYYY-MM-01' (first day of month).
+
+    In v1, any logged-in user (you as PMV/admin) can create a timesheet.
+    We do not assign a specific approver_user_id yet; any Site Engineer
+    can approve later.
     """
     data = request.get_json() or {}
     equipment_id = data.get("equipment_id")
@@ -159,17 +165,16 @@ def create_timesheet():
         db.session.add(ts)
         db.session.flush()
 
-        # Create single-level approval: Site Engineer
-        # You should set current_user.role == 'SiteEngineer' or similar.
+        # Single-level approval: Site Engineer.
+        # We do NOT fix approver_user_id here; any Site Engineer can approve in v1.
         approval = TimesheetApproval(
             timesheet_id=ts.timesheet_id,
             level=1,
             role="SiteEngineer",
-            approver_user_id=current_user.user_id,  # or assign via rules
+            approver_user_id=None,
             status="pending",
         )
         db.session.add(approval)
-
         db.session.commit()
 
     return jsonify(_serialize_timesheet(ts))
@@ -280,11 +285,7 @@ def submit_timesheet(timesheet_id: int):
     if not ts:
         return jsonify({"error": "Timesheet not found"}), 404
 
-    # Only the driver/operator should be allowed to submit; use your own check.
-    if current_user.user_id != ts.driver_id:
-        # If drivers are not in "users" table, you can relax this check for now.
-        pass
-
+    # In v1, any logged-in user (e.g., you as PMV/admin) can submit.
     ts.status = "submitted"
     db.session.commit()
     return jsonify(_serialize_timesheet(ts))
@@ -293,9 +294,12 @@ def submit_timesheet(timesheet_id: int):
 @login_required
 @timesheets_bp.get("/timesheets/pending")
 def list_pending_for_site_engineer():
-    """List all timesheets where current user is the Site Engineer approver and status is pending."""
+    """
+    List all timesheets that are submitted and waiting for Site Engineer approval.
+    In v1, we don't restrict by approver_user_id; any Site Engineer can see them.
+    """
     approvals = TimesheetApproval.query.filter_by(
-        level=1, role="SiteEngineer", approver_user_id=current_user.user_id, status="pending"
+        level=1, role="SiteEngineer", status="pending"
     ).all()
     timesheets = [a.timesheet for a in approvals]
     return jsonify([_serialize_timesheet(ts) for ts in timesheets])
@@ -321,7 +325,8 @@ def approve_timesheet(timesheet_id: int):
     if not approval:
         return jsonify({"error": "Approval record not found"}), 400
 
-    if approval.approver_user_id != current_user.user_id:
+    # Only enforce approver_user_id when explicitly set.
+    if approval.approver_user_id and approval.approver_user_id != current_user.user_id:
         return jsonify({"error": "Not authorized for approval"}), 403
 
     approval.status = "approved"
