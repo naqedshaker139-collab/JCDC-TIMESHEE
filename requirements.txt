@@ -1,0 +1,11 @@
+Flask
+Flask-Login
+Flask-CORS
+Flask-SQLAlchemy
+SQLAlchemy
+pandas
+gunicorn
+pg8000
+psycopg[binary]
+requests
+openpyxl
