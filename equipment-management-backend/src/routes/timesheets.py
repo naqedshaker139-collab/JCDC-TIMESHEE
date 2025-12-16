@@ -3,7 +3,7 @@ from datetime import date, datetime, time
 from flask import Blueprint, jsonify, request
 
 from src.models.equipment import db, Equipment, Driver
-from src.models.timesheet import Timesheet, TimesheetDay, TimesheetApproval
+from src.models.timesheet import Timesheet, TimesheetDay  # NOTE: no TimesheetApproval import
 
 timesheets_bp = Blueprint("timesheets_bp", __name__)
 
@@ -55,7 +55,6 @@ def _calculate_hours(row: TimesheetDay):
 def _serialize_timesheet(ts: Timesheet):
     equipment = ts.equipment
     driver = ts.driver
-    approval = ts.approvals[0] if ts.approvals else None
 
     return {
         "timesheet_id": ts.timesheet_id,
@@ -100,17 +99,8 @@ def _serialize_timesheet(ts: Timesheet):
             }
             for d in sorted(ts.days, key=lambda x: x.log_date)
         ],
-        "approval": {
-            "status": approval.status if approval else None,
-            "role": approval.role if approval else None,
-            "comment": approval.comment if approval else None,
-            "acted_at": approval.acted_at.isoformat()
-            if approval and approval.acted_at
-            else None,
-            "approver_user_id": approval.approver_user_id if approval else None,
-        }
-        if approval
-        else None,
+        # For now, approval info is not used; front-end can rely on status only.
+        "approval": None,
     }
 
 
@@ -120,9 +110,8 @@ def create_timesheet():
     Create (or fetch) a timesheet for given equipment, driver, month_year.
     month_year is 'YYYY-MM-01' (first day of month).
 
-    In v1, we do NOT require login to use this endpoint so that the
-    feature works on Render immediately. approver_user_id is set to 1
-    to satisfy NOT NULL; you can adjust this later when you add real auth.
+    v1: no login required; we just create the record so you
+    can create cards for all drivers/equipment and print them.
     """
     data = request.get_json() or {}
     equipment_id = data.get("equipment_id")
@@ -161,18 +150,6 @@ def create_timesheet():
             status="draft",
         )
         db.session.add(ts)
-        db.session.flush()
-
-        # Single-level approval: Site Engineer.
-        # Use a fixed approver_user_id (e.g., 1) to satisfy NOT NULL.
-        approval = TimesheetApproval(
-            timesheet_id=ts.timesheet_id,
-            level=1,
-            role="SiteEngineer",
-            approver_user_id=1,
-            status="pending",
-        )
-        db.session.add(approval)
         db.session.commit()
 
     return jsonify(_serialize_timesheet(ts))
@@ -286,12 +263,9 @@ def submit_timesheet(timesheet_id: int):
 @timesheets_bp.get("/timesheets/pending")
 def list_pending_for_site_engineer():
     """
-    List all timesheets that are submitted and waiting for Site Engineer approval.
+    v1: Just return timesheets with status='submitted'.
     """
-    approvals = TimesheetApproval.query.filter_by(
-        level=1, role="SiteEngineer", status="pending"
-    ).all()
-    timesheets = [a.timesheet for a in approvals]
+    timesheets = Timesheet.query.filter_by(status="submitted").all()
     return jsonify([_serialize_timesheet(ts) for ts in timesheets])
 
 
@@ -304,20 +278,8 @@ def approve_timesheet(timesheet_id: int):
     if not ts:
         return jsonify({"error": "Timesheet not found"}), 404
 
-    approval = (
-        TimesheetApproval.query.filter_by(
-            timesheet_id=ts.timesheet_id, level=1, role="SiteEngineer"
-        )
-        .order_by(TimesheetApproval.approval_id.desc())
-        .first()
-    )
-    if not approval:
-        return jsonify({"error": "Approval record not found"}), 400
-
-    approval.status = "approved"
-    approval.comment = comment
-    approval.acted_at = datetime.utcnow()
+    # v1: directly update status on the timesheet.
     ts.status = "approved"
-
+    # You could store the comment somewhere later if you add an audit table.
     db.session.commit()
     return jsonify(_serialize_timesheet(ts))
