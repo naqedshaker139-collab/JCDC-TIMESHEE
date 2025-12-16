@@ -1,7 +1,6 @@
 from datetime import date, datetime, time
 
 from flask import Blueprint, jsonify, request
-from flask_login import current_user, login_required
 
 from src.models.equipment import db, Equipment, Driver
 from src.models.timesheet import Timesheet, TimesheetDay, TimesheetApproval
@@ -115,16 +114,15 @@ def _serialize_timesheet(ts: Timesheet):
     }
 
 
-@login_required
 @timesheets_bp.post("/timesheets")
 def create_timesheet():
     """
     Create (or fetch) a timesheet for given equipment, driver, month_year.
     month_year is 'YYYY-MM-01' (first day of month).
 
-    In v1, any logged-in user (you as PMV/admin) can create a timesheet.
-    We record current_user.user_id as approver_user_id to satisfy the
-    NOT NULL constraint; Site Engineers can still use the UI to approve.
+    In v1, we do NOT require login to use this endpoint so that the
+    feature works on Render immediately. approver_user_id is set to 1
+    to satisfy NOT NULL; you can adjust this later when you add real auth.
     """
     data = request.get_json() or {}
     equipment_id = data.get("equipment_id")
@@ -166,12 +164,12 @@ def create_timesheet():
         db.session.flush()
 
         # Single-level approval: Site Engineer.
-        # Use the creator's user_id to satisfy NOT NULL on approver_user_id.
+        # Use a fixed approver_user_id (e.g., 1) to satisfy NOT NULL.
         approval = TimesheetApproval(
             timesheet_id=ts.timesheet_id,
             level=1,
             role="SiteEngineer",
-            approver_user_id=current_user.user_id,
+            approver_user_id=1,
             status="pending",
         )
         db.session.add(approval)
@@ -180,7 +178,6 @@ def create_timesheet():
     return jsonify(_serialize_timesheet(ts))
 
 
-@login_required
 @timesheets_bp.get("/timesheets/<int:timesheet_id>")
 def get_timesheet(timesheet_id: int):
     ts = Timesheet.query.get(timesheet_id)
@@ -189,7 +186,6 @@ def get_timesheet(timesheet_id: int):
     return jsonify(_serialize_timesheet(ts))
 
 
-@login_required
 @timesheets_bp.post("/timesheets/<int:timesheet_id>/clock-in")
 def clock_in(timesheet_id: int):
     data = request.get_json() or {}
@@ -225,7 +221,6 @@ def clock_in(timesheet_id: int):
     return jsonify(_serialize_timesheet(ts))
 
 
-@login_required
 @timesheets_bp.post("/timesheets/<int:timesheet_id>/clock-out")
 def clock_out(timesheet_id: int):
     data = request.get_json() or {}
@@ -251,7 +246,6 @@ def clock_out(timesheet_id: int):
     return jsonify(_serialize_timesheet(ts))
 
 
-@login_required
 @timesheets_bp.patch("/timesheets/days/<int:day_id>")
 def update_day(day_id: int):
     """Edit a daily row (time start/end, break hours, breakdown)."""
@@ -278,25 +272,21 @@ def update_day(day_id: int):
     return jsonify(_serialize_timesheet(day.timesheet))
 
 
-@login_required
 @timesheets_bp.post("/timesheets/<int:timesheet_id>/submit")
 def submit_timesheet(timesheet_id: int):
     ts = Timesheet.query.get(timesheet_id)
     if not ts:
         return jsonify({"error": "Timesheet not found"}), 404
 
-    # In v1, any logged-in user (e.g., you as PMV/admin) can submit.
     ts.status = "submitted"
     db.session.commit()
     return jsonify(_serialize_timesheet(ts))
 
 
-@login_required
 @timesheets_bp.get("/timesheets/pending")
 def list_pending_for_site_engineer():
     """
     List all timesheets that are submitted and waiting for Site Engineer approval.
-    In v1 we simply show those with pending approval.
     """
     approvals = TimesheetApproval.query.filter_by(
         level=1, role="SiteEngineer", status="pending"
@@ -305,7 +295,6 @@ def list_pending_for_site_engineer():
     return jsonify([_serialize_timesheet(ts) for ts in timesheets])
 
 
-@login_required
 @timesheets_bp.post("/timesheets/<int:timesheet_id>/approve")
 def approve_timesheet(timesheet_id: int):
     data = request.get_json() or {}
@@ -325,8 +314,6 @@ def approve_timesheet(timesheet_id: int):
     if not approval:
         return jsonify({"error": "Approval record not found"}), 400
 
-    # In v1, we do not strictly enforce approver_user_id,
-    # since approver_user_id is set to the creator just to satisfy NOT NULL.
     approval.status = "approved"
     approval.comment = comment
     approval.acted_at = datetime.utcnow()
