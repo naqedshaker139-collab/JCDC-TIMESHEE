@@ -16,27 +16,31 @@ export default function TimesheetLauncher() {
   const [error, setError] = useState("");
   const [loadingOptions, setLoadingOptions] = useState(true);
 
-  useEffect(() => {
-    async function loadOptions() {
-      try {
-        setError("");
-        setLoadingOptions(true);
-        // Use same endpoints as EquipmentList / DriverList
-        const [eqRes, drRes] = await Promise.all([
-          api.get("/equipment"),
-          api.get("/drivers"),
-        ]);
-        setEquipment(eqRes.data || []);
-        setDrivers(drRes.data || []);
-      } catch (e) {
-        console.error("Failed to load equipment or drivers:", e);
+useEffect(() => {
+  async function loadOptions() {
+    try {
+      setError("");
+      setLoadingOptions(true);
+      const [eqRes, drRes] = await Promise.all([
+        api.get("/equipment"),
+        api.get("/drivers"),
+      ]);
+      setEquipment(eqRes.data || []);
+      setDrivers(drRes.data || []);
+    } catch (e) {
+      console.error("Failed to load equipment or drivers:", e);
+      const code = e?.code || e?.response?.status;
+      if (code === "ECONNABORTED") {
+        setError("Server is waking up. Please wait a bit and try again.");
+      } else {
         setError("Failed to load equipment or drivers.");
-      } finally {
-        setLoadingOptions(false);
       }
+    } finally {
+      setLoadingOptions(false);
     }
-    loadOptions();
-  }, []);
+  }
+  loadOptions();
+}, []);
 
   async function handleCreate() {
     if (!equipmentId || !driverId || !monthYear) {
