@@ -1,9 +1,10 @@
 from datetime import date, datetime, time
+from calendar import monthrange
 
 from flask import Blueprint, jsonify, request
 
 from src.models.equipment import db, Equipment, Driver
-from src.models.timesheet import Timesheet, TimesheetDay  # NOTE: no TimesheetApproval import
+from src.models.timesheet import Timesheet, TimesheetDay  # no TimesheetApproval in v1
 
 timesheets_bp = Blueprint("timesheets_bp", __name__)
 
@@ -99,7 +100,7 @@ def _serialize_timesheet(ts: Timesheet):
             }
             for d in sorted(ts.days, key=lambda x: x.log_date)
         ],
-        # For now, approval info is not used; front-end can rely on status only.
+        # v1: approval info not used; rely on status.
         "approval": None,
     }
 
@@ -110,8 +111,8 @@ def create_timesheet():
     Create (or fetch) a timesheet for given equipment, driver, month_year.
     month_year is 'YYYY-MM-01' (first day of month).
 
-    v1: no login required; we just create the record so you
-    can create cards for all drivers/equipment and print them.
+    When creating a new timesheet, we also create one TimesheetDay row
+    for each day in that month so the card shows the full month grid.
     """
     data = request.get_json() or {}
     equipment_id = data.get("equipment_id")
@@ -150,6 +151,22 @@ def create_timesheet():
             status="draft",
         )
         db.session.add(ts)
+        db.session.flush()  # get ts.timesheet_id
+
+        # Create a TimesheetDay for every day in the month
+        year = month_year.year
+        month = month_year.month
+        days_in_month = monthrange(year, month)[1]
+        for day in range(1, days_in_month + 1):
+            log_date = date(year, month, day)
+            db.session.add(
+                TimesheetDay(
+                    timesheet_id=ts.timesheet_id,
+                    log_date=log_date,
+                    duty_break_hrs=1,  # default break
+                )
+            )
+
         db.session.commit()
 
     return jsonify(_serialize_timesheet(ts))
@@ -180,6 +197,7 @@ def clock_in(timesheet_id: int):
     now = datetime.utcnow().time()
 
     if not day:
+        # fallback: create if somehow missing
         day = TimesheetDay(
             timesheet_id=ts.timesheet_id,
             log_date=log_date,
