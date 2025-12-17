@@ -14,25 +14,29 @@ export default function TimesheetLauncher() {
   const [monthYear, setMonthYear] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
+  const [loadingOptions, setLoadingOptions] = useState(true);
 
-useEffect(() => {
-  async function loadOptions() {
-    try {
-      setError("");
-      // IMPORTANT: use the same endpoints your EquipmentList / DriverList use.
-      const [eqRes, drRes] = await Promise.all([
-        api.get("/equipment"), // adapt if your list endpoint is different
-        api.get("/drivers"),   // adapt if your list endpoint is different
-      ]);
-      setEquipment(eqRes.data || []);
-      setDrivers(drRes.data || []);
-    } catch (e) {
-      console.error(e);
-      setError("Failed to load equipment or drivers.");
+  useEffect(() => {
+    async function loadOptions() {
+      try {
+        setError("");
+        setLoadingOptions(true);
+        // Use same endpoints as EquipmentList / DriverList
+        const [eqRes, drRes] = await Promise.all([
+          api.get("/equipment"),
+          api.get("/drivers"),
+        ]);
+        setEquipment(eqRes.data || []);
+        setDrivers(drRes.data || []);
+      } catch (e) {
+        console.error("Failed to load equipment or drivers:", e);
+        setError("Failed to load equipment or drivers.");
+      } finally {
+        setLoadingOptions(false);
+      }
     }
-  }
-  loadOptions();
-}, []);
+    loadOptions();
+  }, []);
 
   async function handleCreate() {
     if (!equipmentId || !driverId || !monthYear) {
@@ -74,61 +78,69 @@ useEffect(() => {
               </div>
             )}
 
-            {/* Equipment */}
-            <div className="space-y-1">
-              <label className="text-xs font-semibold text-slate-700">
-                Equipment
-              </label>
-              <select
-                className="w-full border border-slate-300 rounded px-2 py-2 text-sm bg-white"
-                value={equipmentId}
-                onChange={(e) => setEquipmentId(e.target.value)}
-              >
-                <option value="">Select equipment…</option>
-                {equipment.map((e) => (
-                  <option key={e.equipment_id} value={e.equipment_id}>
-                    {e.equipment_name} ({e.plate_serial_no})
-                  </option>
-                ))}
-              </select>
-            </div>
+            {loadingOptions ? (
+              <div className="text-xs text-slate-500 py-4">
+                Loading equipment and drivers…
+              </div>
+            ) : (
+              <>
+                {/* Equipment */}
+                <div className="space-y-1">
+                  <label className="text-xs font-semibold text-slate-700">
+                    Equipment
+                  </label>
+                  <select
+                    className="w-full border border-slate-300 rounded px-2 py-2 text-sm bg-white"
+                    value={equipmentId}
+                    onChange={(e) => setEquipmentId(e.target.value)}
+                  >
+                    <option value="">Select equipment…</option>
+                    {equipment.map((e) => (
+                      <option key={e.equipment_id} value={e.equipment_id}>
+                        {e.equipment_name} ({e.plate_serial_no})
+                      </option>
+                    ))}
+                  </select>
+                </div>
 
-            {/* Driver */}
-            <div className="space-y-1">
-              <label className="text-xs font-semibold text-slate-700">
-                Driver / Operator
-              </label>
-              <select
-                className="w-full border border-slate-300 rounded px-2 py-2 text-sm bg-white"
-                value={driverId}
-                onChange={(e) => setDriverId(e.target.value)}
-              >
-                <option value="">Select driver…</option>
-                {drivers.map((d) => (
-                  <option key={d.driver_id} value={d.driver_id}>
-                    {d.driver_name} ({d.eqama_number})
-                  </option>
-                ))}
-              </select>
-            </div>
+                {/* Driver */}
+                <div className="space-y-1">
+                  <label className="text-xs font-semibold text-slate-700">
+                    Driver / Operator
+                  </label>
+                  <select
+                    className="w-full border border-slate-300 rounded px-2 py-2 text-sm bg-white"
+                    value={driverId}
+                    onChange={(e) => setDriverId(e.target.value)}
+                  >
+                    <option value="">Select driver…</option>
+                    {drivers.map((d) => (
+                      <option key={d.driver_id} value={d.driver_id}>
+                        {d.driver_name} ({d.eqama_number})
+                      </option>
+                    ))}
+                  </select>
+                </div>
 
-            {/* Month */}
-            <div className="space-y-1">
-              <label className="text-xs font-semibold text-slate-700">
-                Month
-              </label>
-              <Input
-                type="month"
-                value={monthYear}
-                onChange={(e) => setMonthYear(e.target.value)}
-                className="text-sm"
-              />
-            </div>
+                {/* Month */}
+                <div className="space-y-1">
+                  <label className="text-xs font-semibold text-slate-700">
+                    Month
+                  </label>
+                  <Input
+                    type="month"
+                    value={monthYear}
+                    onChange={(e) => setMonthYear(e.target.value)}
+                    className="text-sm"
+                  />
+                </div>
+              </>
+            )}
 
             <Button
               onClick={handleCreate}
-              disabled={busy}
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold"
+              disabled={busy || loadingOptions}
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold disabled:opacity-50"
             >
               {busy ? "Creating…" : "Create Time Card"}
             </Button>
