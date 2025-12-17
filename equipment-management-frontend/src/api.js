@@ -5,7 +5,7 @@ const base = import.meta.env?.VITE_API_BASE || '/api';
 const api = axios.create({
   baseURL: base,
   withCredentials: true,
-  timeout: 20000,
+  timeout: 60000,
   headers: {
     Accept: 'application/json',
   },
