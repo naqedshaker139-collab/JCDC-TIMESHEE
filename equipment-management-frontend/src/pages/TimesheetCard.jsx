@@ -23,6 +23,13 @@ function formatMonthRange(monthYear) {
   return `${fmt(first)} – ${fmt(last)} ${year}`;
 }
 
+function isFriday(isoDate) {
+  if (!isoDate) return false;
+  const d = new Date(isoDate);
+  // 0=Sun, 1=Mon, ..., 5=Fri
+  return d.getDay() === 5;
+}
+
 export default function TimesheetCard() {
   const { id } = useParams(); // /timesheets/:id
   const navigate = useNavigate();
@@ -187,10 +194,10 @@ export default function TimesheetCard() {
     );
   }
 
-return (
-  <div className="min-h-screen bg-slate-100 p-4 md:p-8">
-    <div className="max-w-5xl mx-auto bg-white shadow border border-slate-200 p-4 md:p-6 timesheet-print-page">
-                 {/* Top header / logos (compressed for print height) */}
+  return (
+    <div className="min-h-screen bg-slate-100 p-4 md:p-8">
+      <div className="max-w-5xl mx-auto bg-white shadow border border-slate-200 p-4 md:p-6 timesheet-print-page">
+        {/* Top header / logos (compressed for print height) */}
         <div className="flex justify-between items-start border-b border-slate-300 pb-2 mb-3">
           {/* Left: project info */}
           <div className="text-[10px] text-slate-600">
@@ -293,53 +300,52 @@ return (
               </div>
               <div className="flex-1 px-2 py-1">
                 {timesheet.start_meter ?? ""}{" "}
-                {timesheet.start_meter != null ? "–" : ""}
-                {" "}
+                {timesheet.start_meter != null ? "–" : ""}{" "}
                 {timesheet.end_meter ?? ""}
               </div>
             </div>
           </div>
         </div>
 
-       {/* clock controls and status */}
-<div className="flex flex-wrap items-center justify-between gap-3 mb-4">
-  <div className="flex flex-col gap-1">
-    <div className="flex gap-2">
-      <button
-        onClick={handleClockIn}
-        disabled={busy || isSubmitted || isApproved}
-        className="px-4 py-2 text-xs font-semibold rounded bg-green-600 text-white hover:bg-green-700 disabled:opacity-50"
-      >
-        Clock In (Today)
-      </button>
-      <button
-        onClick={handleClockOut}
-        disabled={busy || isSubmitted || isApproved}
-        className="px-4 py-2 text-xs font-semibold rounded bg-red-600 text-white hover:bg-red-700 disabled:opacity-50"
-      >
-        Clock Out (Today)
-      </button>
-    </div>
-    <div className="text-[10px] text-slate-500">
-      Note: For past days, type the start/end times directly in the table below.
-      Clock buttons are only a shortcut for today.
-    </div>
-  </div>
-  <div className="text-xs text-slate-600">
-    Status:&nbsp;
-    <span
-      className={
-        isApproved
-          ? "font-semibold text-green-700"
-          : isSubmitted
-          ? "font-semibold text-amber-700"
-          : "font-semibold text-slate-700"
-      }
-    >
-      {timesheet.status}
-    </span>
-  </div>
-</div>
+        {/* clock controls and status */}
+        <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
+          <div className="flex flex-col gap-1">
+            <div className="flex gap-2">
+              <button
+                onClick={handleClockIn}
+                disabled={busy || isSubmitted || isApproved}
+                className="px-4 py-2 text-xs font-semibold rounded bg-green-600 text-white hover:bg-green-700 disabled:opacity-50"
+              >
+                Clock In (Today)
+              </button>
+              <button
+                onClick={handleClockOut}
+                disabled={busy || isSubmitted || isApproved}
+                className="px-4 py-2 text-xs font-semibold rounded bg-red-600 text-white hover:bg-red-700 disabled:opacity-50"
+              >
+                Clock Out (Today)
+              </button>
+            </div>
+            <div className="text-[10px] text-slate-500">
+              Note: For past days, type the start/end times directly in the table
+              below. Clock buttons are only a shortcut for today.
+            </div>
+          </div>
+          <div className="text-xs text-slate-600">
+            Status:&nbsp;
+            <span
+              className={
+                isApproved
+                  ? "font-semibold text-green-700"
+                  : isSubmitted
+                  ? "font-semibold text-amber-700"
+                  : "font-semibold text-slate-700"
+              }
+            >
+              {timesheet.status}
+            </span>
+          </div>
+        </div>
 
         {/* Daily grid */}
         <div className="border border-slate-300 text-[11px] overflow-x-auto">
@@ -375,8 +381,16 @@ return (
             <tbody>
               {timesheet.days.map((d) => {
                 const disabled = isApproved;
+                const friday = isFriday(d.log_date);
                 return (
-                  <tr key={d.day_id} className="odd:bg-white even:bg-slate-50">
+                  <tr
+                    key={d.day_id}
+                    className={
+                      friday
+                        ? "bg-yellow-50"
+                        : "odd:bg-white even:bg-slate-50"
+                    }
+                  >
                     <td className="border border-slate-200 px-1 py-1">
                       {formatDateLabel(d.log_date)}
                     </td>
@@ -534,17 +548,13 @@ return (
               <div className="font-semibold mb-1 text-slate-700">
                 Head Of Dept.
               </div>
-              <div className="text-slate-400 text-[10px]">
-                
-              </div>
+              <div className="text-slate-400 text-[10px]"></div>
             </div>
             <div className="px-2 py-3 text-center">
               <div className="font-semibold mb-1 text-slate-700">
                 PMV Manager / Project Manager
               </div>
-              <div className="text-slate-400 text-[10px]">
-                
-              </div>
+              <div className="text-slate-400 text-[10px]"></div>
             </div>
           </div>
         </div>
