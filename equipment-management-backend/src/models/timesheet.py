@@ -1,9 +1,8 @@
 from datetime import datetime
 
-from src.models.equipment import db  # db comes from your existing equipment models
+from src.models.equipment import db
 
 
- 
 class Timesheet(db.Model):
     __tablename__ = "timesheets"
 
@@ -52,7 +51,6 @@ class Timesheet(db.Model):
     )
 
 
- 
 class TimesheetDay(db.Model):
     __tablename__ = "timesheet_days"
 
@@ -81,9 +79,6 @@ class TimesheetDay(db.Model):
     )
 
 
- 
-# Keep TimesheetApproval model defined for future use (multi-level approvals),
-# but it's not used in v1 and we don't import it from routes right now.
 class TimesheetApproval(db.Model):
     __tablename__ = "timesheet_approvals"
 
