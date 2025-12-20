@@ -187,9 +187,9 @@ export default function TimesheetCard() {
     );
   }
 
-  return (
-    <div className="min-h-screen bg-slate-100 p-4 md:p-8">
-      <div className="max-w-5xl mx-auto bg-white shadow border border-slate-200 p-4 md:p-6">
+return (
+  <div className="min-h-screen bg-slate-100 p-4 md:p-8">
+    <div className="max-w-5xl mx-auto bg-white shadow border border-slate-200 p-4 md:p-6 timesheet-print-page">
         {/* Top header / logos */}
         <div className="flex flex-col items-center border-b border-slate-300 pb-4 mb-4">
           <div className="text-[10px] text-center font-semibold text-slate-600 uppercase tracking-wide">
@@ -294,39 +294,45 @@ export default function TimesheetCard() {
           </div>
         </div>
 
-        {/* clock controls and status */}
-        <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
-          <div className="flex gap-2">
-            <button
-              onClick={handleClockIn}
-              disabled={busy || isSubmitted || isApproved}
-              className="px-4 py-2 text-xs font-semibold rounded bg-green-600 text-white hover:bg-green-700 disabled:opacity-50"
-            >
-              Clock In (Today)
-            </button>
-            <button
-              onClick={handleClockOut}
-              disabled={busy || isSubmitted || isApproved}
-              className="px-4 py-2 text-xs font-semibold rounded bg-red-600 text-white hover:bg-red-700 disabled:opacity-50"
-            >
-              Clock Out (Today)
-            </button>
-          </div>
-          <div className="text-xs text-slate-600">
-            Status:&nbsp;
-            <span
-              className={
-                isApproved
-                  ? "font-semibold text-green-700"
-                  : isSubmitted
-                  ? "font-semibold text-amber-700"
-                  : "font-semibold text-slate-700"
-              }
-            >
-              {timesheet.status}
-            </span>
-          </div>
-        </div>
+       {/* clock controls and status */}
+<div className="flex flex-wrap items-center justify-between gap-3 mb-4">
+  <div className="flex flex-col gap-1">
+    <div className="flex gap-2">
+      <button
+        onClick={handleClockIn}
+        disabled={busy || isSubmitted || isApproved}
+        className="px-4 py-2 text-xs font-semibold rounded bg-green-600 text-white hover:bg-green-700 disabled:opacity-50"
+      >
+        Clock In (Today)
+      </button>
+      <button
+        onClick={handleClockOut}
+        disabled={busy || isSubmitted || isApproved}
+        className="px-4 py-2 text-xs font-semibold rounded bg-red-600 text-white hover:bg-red-700 disabled:opacity-50"
+      >
+        Clock Out (Today)
+      </button>
+    </div>
+    <div className="text-[10px] text-slate-500">
+      Note: For past days, type the start/end times directly in the table below.
+      Clock buttons are only a shortcut for today.
+    </div>
+  </div>
+  <div className="text-xs text-slate-600">
+    Status:&nbsp;
+    <span
+      className={
+        isApproved
+          ? "font-semibold text-green-700"
+          : isSubmitted
+          ? "font-semibold text-amber-700"
+          : "font-semibold text-slate-700"
+      }
+    >
+      {timesheet.status}
+    </span>
+  </div>
+</div>
 
         {/* Daily grid */}
         <div className="border border-slate-300 text-[11px] overflow-x-auto">
@@ -522,7 +528,7 @@ export default function TimesheetCard() {
                 Head Of Dept.
               </div>
               <div className="text-slate-400 text-[10px]">
-                Future level
+                
               </div>
             </div>
             <div className="px-2 py-3 text-center">
@@ -530,7 +536,7 @@ export default function TimesheetCard() {
                 PMV Manager / Project Manager
               </div>
               <div className="text-slate-400 text-[10px]">
-                Future levels
+                
               </div>
             </div>
           </div>

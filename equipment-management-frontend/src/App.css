@@ -189,3 +189,48 @@
   }
 }
 
+/* === Print layout for Time Card === */
+@media print {
+  /* Remove default browser margins */
+  @page {
+    size: A4 portrait;
+    margin: 8mm;
+  }
+
+  body {
+    margin: 0;
+    background: #ffffff;
+  }
+
+  /* Only print the card content */
+  .timesheet-print-page {
+    box-shadow: none !important;
+    border: 1px solid #666 !important;
+    width: 100%;
+    height: auto;
+    page-break-inside: avoid;
+    /* Slight scale down to ensure full month fits on one page */
+    transform: scale(0.9);
+    transform-origin: top left;
+    font-size: 10px;
+  }
+
+  /* Reduce padding to fit more */
+  .timesheet-print-page > * {
+    padding: 0;
+  }
+
+  /* Hide buttons and interactive controls in print */
+  button,
+  .timesheet-print-page button {
+    display: none !important;
+  }
+
+  /* Optionally hide navigation/header/footer from your app */
+  nav,
+  header,
+  footer {
+    display: none !important;
+  }
+}
+
