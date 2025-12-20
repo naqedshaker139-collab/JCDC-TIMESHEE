@@ -219,10 +219,10 @@
     page-break-inside: avoid;
 
     /* Stronger shrink so full month fits */
-    transform: scale(0.6);
+    transform: scale(0.5);
     transform-origin: top left;
 
-    font-size: 7px;
+    font-size: 6px;
   }
 
   /* Tighten padding inside card */
