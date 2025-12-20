@@ -190,25 +190,32 @@ export default function TimesheetCard() {
 return (
   <div className="min-h-screen bg-slate-100 p-4 md:p-8">
     <div className="max-w-5xl mx-auto bg-white shadow border border-slate-200 p-4 md:p-6 timesheet-print-page">
-        {/* Top header / logos */}
-        <div className="flex flex-col items-center border-b border-slate-300 pb-4 mb-4">
-          <div className="text-[10px] text-center font-semibold text-slate-600 uppercase tracking-wide">
-            Stadium and Surrounding Village
+                 {/* Top header / logos (compressed for print height) */}
+        <div className="flex justify-between items-start border-b border-slate-300 pb-2 mb-3">
+          {/* Left: project info */}
+          <div className="text-[10px] text-slate-600">
+            <div className="font-semibold uppercase tracking-wide">
+              Stadium and Surrounding Village
+            </div>
+            <div className="text-slate-500">
+              Obhor Jeddah Central Development Company (JCDC) – CRCC &amp; SAMA
+            </div>
           </div>
-          <div className="text-[10px] text-center text-slate-500">
-            Obhor Jeddah Central Development Company (JCDC) – CRCC & SAMA
-          </div>
-          <div className="mt-2 text-xs font-semibold text-red-700 uppercase">
-            Machinery / Plant / Vehicle Division
-          </div>
-          <div className="mt-2 px-4 py-1 border border-slate-400 bg-yellow-50 text-xs font-bold text-slate-800 uppercase">
-            Equipment Time Card
-          </div>
-          <div className="mt-1 text-[11px] text-slate-600">
-            Month:&nbsp;
-            <span className="font-semibold">
-              {formatMonthRange(timesheet.month_year)}
-            </span>
+
+          {/* Right: division, title, month – stacked but narrower */}
+          <div className="text-right text-[10px] text-slate-700">
+            <div className="font-semibold text-red-700 uppercase">
+              Machinery / Plant / Vehicle Division
+            </div>
+            <div className="mt-1 inline-block px-3 py-0.5 border border-slate-400 bg-yellow-50 text-xs font-bold text-slate-800 uppercase">
+              Equipment Time Card
+            </div>
+            <div className="mt-1">
+              Month:&nbsp;
+              <span className="font-semibold">
+                {formatMonthRange(timesheet.month_year)}
+              </span>
+            </div>
           </div>
         </div>
 
