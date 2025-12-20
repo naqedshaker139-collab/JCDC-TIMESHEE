@@ -222,7 +222,7 @@
     transform: scale(0.6);
     transform-origin: top left;
 
-    font-size: 9px;
+    font-size: 7px;
   }
 
   /* Tighten padding inside card */
@@ -233,7 +233,7 @@
 
   /* Table text smaller and rows tighter */
   .timesheet-print-page table {
-    font-size: 6px;
+    font-size: 5px;
   }
 
   .timesheet-print-page th,
