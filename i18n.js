@@ -175,6 +175,93 @@ const resources = {
       // General
       "language": "ar"
     }
+  },
+  zh: {
+    translation: {
+      // Navigation
+      "dashboard": "仪表盘",
+      "equipment": "设备",
+      "drivers": "司机",
+      "request_equipment": "设备申请",
+      "request_history": "申请记录",
+      
+      // Dashboard
+      "welcome": "欢迎使用设备管理系统",
+      "total_equipment": "设备总数",
+      "available_equipment": "可用设备",
+      "total_drivers": "司机总数",
+      "pending_requests": "待处理申请",
+      
+      // Equipment
+      "asset_no": "资产编号",
+      "equipment_name": "设备名称",
+      "plate_serial_no": "车牌号/序列号",
+      "shift_type": "班次类型",
+      "num_shifts_requested": "申请班次数量",
+      "status": "状态",
+      "zone_department": "区域/部门",
+      "mobilized_date": "进场日期",
+      "demobilization_date": "退场日期",
+      "company_supplier": "公司/供应商",
+      "remarks": "备注",
+      "assigned_driver": "指定司机",
+      "add_equipment": "新增设备",
+      "search_equipment": "搜索设备...",
+      "unassigned": "未分配",
+      
+      // Equipment Categories
+      "forklifts": "叉车",
+      "telehandlers": "伸缩臂叉装车",
+      "loaders": "装载机",
+      "rollers_compactors": "压路机/压实机",
+      "excavators": "挖掘机",
+      "trucks": "卡车",
+      "cranes": "起重机",
+      "lifts": "升降机",
+      "graders": "平地机",
+      
+      // Drivers
+      "driver_name": "司机姓名",
+      "phone_number": "电话号码",
+      "eqama_number": "居留证号",
+      "assigned_machine": "分配设备",
+      "add_driver": "新增司机",
+      "search_drivers": "搜索司机...",
+      "call": "拨打电话",
+      "day_shift": "白班",
+      "night_shift": "夜班",
+      
+      // Requests
+      "engineer_name": "工程师姓名",
+      "requested_equipment": "申请设备",
+      "request_time": "申请时间",
+      "notes": "备注",
+      "submit_request": "提交申请",
+      "request_reason": "申请原因",
+      
+      // Status
+      "available": "可用",
+      "active": "启用",
+      "in_use": "使用中",
+      "maintenance": "维修中",
+      "pending": "待处理",
+      "approved": "已批准",
+      "completed": "已完成",
+      
+      // Actions
+      "search": "搜索",
+      "filter": "筛选",
+      "submit": "提交",
+      "cancel": "取消",
+      "save": "保存",
+      "edit": "编辑",
+      "delete": "删除",
+      "view": "查看",
+      "back": "返回",
+      
+      // General
+      "language": "zh"
+    }
   }
 };
 
@@ -190,4 +277,3 @@ i18n
   });
 
 export default i18n;
-

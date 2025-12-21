@@ -9,12 +9,6 @@ const Layout = ({ children }) => {
 
   const isRTL = i18n.language === 'ar';
 
-  const toggleLanguage = () => {
-    const newLang = i18n.language === 'en' ? 'ar' : 'en';
-    i18n.changeLanguage(newLang);
-    document.dir = newLang === 'ar' ? 'rtl' : 'ltr';
-  };
-
   const navigation = [
     { name: t('dashboard'), href: '/' },
     { name: t('equipment'), href: '/equipment' },
@@ -64,15 +58,23 @@ const Layout = ({ children }) => {
 
             {/* Language Switcher and Mobile menu button */}
             <div className="flex items-center space-x-4">
-              <Button
-                onClick={toggleLanguage}
-                variant="ghost"
-                size="sm"
-                className="text-primary-foreground hover:bg-white/10"
-              >
-                <Globe className="h-4 w-4 mr-2" />
-                {i18n.language === 'en' ? 'العربية' : 'English'}
-              </Button>
+              {/* Language selector */}
+              <div className="flex items-center">
+                <Globe className="h-4 w-4 mr-2 text-primary-foreground" />
+                <select
+                  value={i18n.language}
+                  onChange={(e) => {
+                    const lang = e.target.value;
+                    i18n.changeLanguage(lang);
+                    document.dir = lang === 'ar' ? 'rtl' : 'ltr';
+                  }}
+                  className="bg-transparent border border-white/30 text-primary-foreground text-xs px-2 py-1 rounded-md focus:outline-none focus:ring-1 focus:ring-white/60"
+                >
+                  <option value="en">English</option>
+                  <option value="zh">中文</option>
+                  <option value="ar">العربية</option>
+                </select>
+              </div>
 
               {/* Mobile menu button */}
               <div className="md:hidden">
