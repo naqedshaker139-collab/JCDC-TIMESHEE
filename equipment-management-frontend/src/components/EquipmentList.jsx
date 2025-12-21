@@ -44,10 +44,14 @@ const getStatus = (eq) => (eq?.status ?? eq?.equipment_status ?? '').trim();
 const getAsset = (eq) => (eq?.asset_no ?? eq?.assetNo ?? '').trim();
 const getPlate = (eq) => (eq?.plate_serial_no ?? eq?.plateSerialNo ?? '').trim();
 const getDept = (eq) => (eq?.zone_department ?? eq?.department ?? '').trim();
-const getDayDriverName = (eq) => (eq?.day_shift_driver_name ?? eq?.dayDriverName ?? '').trim();
-const getDayDriverPhone = (eq) => (eq?.day_shift_driver_phone ?? eq?.dayDriverPhone ?? '').trim();
-const getNightDriverName = (eq) => (eq?.night_shift_driver_name ?? eq?.nightDriverName ?? '').trim();
-const getNightDriverPhone = (eq) => (eq?.night_shift_driver_phone ?? eq?.nightDriverPhone ?? '').trim();
+const getDayDriverName = (eq) =>
+  (eq?.day_shift_driver_name ?? eq?.dayDriverName ?? '').trim();
+const getDayDriverPhone = (eq) =>
+  (eq?.day_shift_driver_phone ?? eq?.dayDriverPhone ?? '').trim();
+const getNightDriverName = (eq) =>
+  (eq?.night_shift_driver_name ?? eq?.nightDriverName ?? '').trim();
+const getNightDriverPhone = (eq) =>
+  (eq?.night_shift_driver_phone ?? eq?.nightDriverPhone ?? '').trim();
 
 /* -------------------------------------------------------------------------- */
 /* Component */
@@ -66,7 +70,8 @@ export default function EquipmentList() {
       name: 'Forklifts',
       nameAr: 'الرافعات الشوكية',
       icon: Forklift,
-      color: 'bg-blue-100 text-blue-800 hover:bg-blue-200',
+      iconBg: 'bg-red-100',
+      iconText: 'text-red-700',
       keywords: ['forklift 10ton', 'forklift 16ton', 'forklift'],
     },
     {
@@ -74,7 +79,8 @@ export default function EquipmentList() {
       name: 'Telehandlers',
       nameAr: 'الرافعات التلسكوبية',
       icon: Construction,
-      color: 'bg-green-100 text-green-800 hover:bg-green-200',
+      iconBg: 'bg-amber-100',
+      iconText: 'text-amber-700',
       keywords: ['telehanlder', 'telehandler'],
     },
     {
@@ -82,15 +88,22 @@ export default function EquipmentList() {
       name: 'Loaders',
       nameAr: 'المحملات',
       icon: Loader,
-      color: 'bg-yellow-100 text-yellow-800 hover:bg-yellow-200',
-      keywords: ['backhoe loader', 'skid steel loader', 'wheel loader', 'loader'],
+      iconBg: 'bg-orange-100',
+      iconText: 'text-orange-700',
+      keywords: [
+        'backhoe loader',
+        'skid steel loader',
+        'wheel loader',
+        'loader',
+      ],
     },
     {
       id: 'rollers',
       name: 'Rollers/Compactors',
       nameAr: 'الضاغطات',
       icon: RollerCoaster,
-      color: 'bg-purple-100 text-purple-800 hover:bg-purple-200',
+      iconBg: 'bg-purple-100',
+      iconText: 'text-purple-700',
       keywords: [
         'roller compactor 3 ton',
         'roller compactor 10ton',
@@ -104,7 +117,8 @@ export default function EquipmentList() {
       name: 'Excavators',
       nameAr: 'الحفارات',
       icon: Shovel,
-      color: 'bg-orange-100 text-orange-800 hover:bg-orange-200',
+      iconBg: 'bg-emerald-100',
+      iconText: 'text-emerald-700',
       keywords: ['mini excavator', 'excavator'],
     },
     {
@@ -112,7 +126,8 @@ export default function EquipmentList() {
       name: 'Trucks',
       nameAr: 'الشاحنات',
       icon: Truck,
-      color: 'bg-red-100 text-red-800 hover:bg-red-200',
+      iconBg: 'bg-slate-100',
+      iconText: 'text-slate-700',
       keywords: [
         'water tanker(18000ltr)',
         'boom truck',
@@ -134,7 +149,8 @@ export default function EquipmentList() {
       name: 'Cranes',
       nameAr: 'الرافعات',
       icon: Building,
-      color: 'bg-indigo-100 text-indigo-800 hover:bg-indigo-200',
+      iconBg: 'bg-indigo-100',
+      iconText: 'text-indigo-700',
       keywords: [
         'towercrane',
         'mobile crane -truck mounted',
@@ -149,7 +165,8 @@ export default function EquipmentList() {
       name: 'Manlifts/Scissor Lifts',
       nameAr: 'المنصات الهوائية/المقصية',
       icon: ArrowBigUp,
-      color: 'bg-pink-100 text-pink-800 hover:bg-pink-200',
+      iconBg: 'bg-pink-100',
+      iconText: 'text-pink-700',
       keywords: [
         'manlift 22m with operator',
         'manlif 26m with operator',
@@ -164,7 +181,8 @@ export default function EquipmentList() {
       name: 'Graders',
       nameAr: 'المسويات',
       icon: Gauge,
-      color: 'bg-teal-100 text-teal-800 hover:bg-teal-200',
+      iconBg: 'bg-teal-100',
+      iconText: 'text-teal-700',
       keywords: ['grader'],
     },
   ];
@@ -196,7 +214,9 @@ export default function EquipmentList() {
     const rows = Array.isArray(equipment) ? equipment : [];
     const map = {};
     for (const cat of categories) {
-      map[cat.id] = rows.filter((eq) => includesAny(getName(eq), cat.keywords)).length;
+      map[cat.id] = rows.filter((eq) =>
+        includesAny(getName(eq), cat.keywords)
+      ).length;
     }
     return map;
   }, [equipment]);
@@ -225,13 +245,13 @@ export default function EquipmentList() {
   const getStatusColor = (status = '') => {
     switch (norm(status)) {
       case 'active':
-        return 'bg-green-100 text-green-800';
+        return 'bg-emerald-100 text-emerald-800';
       case 'in use':
         return 'bg-blue-100 text-blue-800';
       case 'maintenance':
         return 'bg-red-100 text-red-800';
       default:
-        return 'bg-gray-100 text-gray-800';
+        return 'bg-slate-100 text-slate-800';
     }
   };
 
@@ -242,7 +262,7 @@ export default function EquipmentList() {
   if (loading) {
     return (
       <div className="flex justify-center items-center h-64">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-900" />
+        <div className="animate-spin rounded-full h-16 w-16 border-4 border-primary/20 border-t-primary" />
       </div>
     );
   }
@@ -252,13 +272,15 @@ export default function EquipmentList() {
     return (
       <div className="space-y-6">
         <div className="flex justify-between items-center">
-          <h1 className="text-3xl font-bold text-gray-900">{t('equipment')}</h1>
+          <h1 className="text-3xl font-bold text-slate-900">
+            {t('equipment')}
+          </h1>
         </div>
 
         <Card>
           <CardContent className="pt-6">
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 h-4 w-4" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 h-4 w-4" />
               <Input
                 placeholder={t('search_equipment')}
                 value={searchTerm}
@@ -276,17 +298,29 @@ export default function EquipmentList() {
             return (
               <Card
                 key={category.id}
-                className={`cursor-pointer transition-all duration-200 hover:shadow-lg ${category.color}`}
+                className="cursor-pointer transition-all duration-200 hover:shadow-md border border-border bg-card"
                 onClick={() => setSelectedCategory(category.id)}
               >
-                <CardContent className="p-6 text-center">
-                  <Icon className="h-12 w-12 mx-auto mb-3" />
-                  <h3 className="font-semibold text-lg mb-1">
-                    {t('language') === 'ar' ? category.nameAr : category.name}
-                  </h3>
-                  <p className="text-sm opacity-75">
-                    {count} {t('equipment')}
-                  </p>
+                <CardContent className="p-4">
+                  <div className="flex items-center gap-3">
+                    <div
+                      className={`w-10 h-10 rounded-full flex items-center justify-center ${category.iconBg}`}
+                    >
+                      <Icon
+                        className={`h-5 w-5 ${category.iconText}`}
+                      />
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="font-semibold text-sm text-slate-900">
+                        {t('language') === 'ar'
+                          ? category.nameAr
+                          : category.name}
+                      </h3>
+                      <p className="text-[11px] text-slate-500 mt-0.5">
+                        {count} {t('equipment')}
+                      </p>
+                    </div>
+                  </div>
                 </CardContent>
               </Card>
             );
@@ -295,7 +329,7 @@ export default function EquipmentList() {
 
         {searchTerm && (
           <div className="space-y-4">
-            <h2 className="text-xl font-semibold">
+            <h2 className="text-xl font-semibold text-slate-900">
               Search Results ({filteredEquipment.length})
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -314,7 +348,9 @@ export default function EquipmentList() {
   }
 
   /* List view of one category */
-  const selectedCategoryData = categories.find((c) => c.id === selectedCategory);
+  const selectedCategoryData = categories.find(
+    (c) => c.id === selectedCategory
+  );
 
   return (
     <div className="space-y-6">
@@ -328,12 +364,12 @@ export default function EquipmentList() {
           <span>{t('back')}</span>
         </Button>
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">
+          <h1 className="text-3xl font-bold text-slate-900">
             {t('language') === 'ar'
               ? selectedCategoryData?.nameAr
               : selectedCategoryData?.name}
           </h1>
-          <p className="text-gray-600">
+          <p className="text-slate-600">
             {filteredEquipment.length} {t('equipment')}
           </p>
         </div>
@@ -342,7 +378,7 @@ export default function EquipmentList() {
       <Card>
         <CardContent className="pt-6">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 h-4 w-4" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 h-4 w-4" />
             <Input
               placeholder={t('search_equipment')}
               value={searchTerm}
@@ -365,8 +401,10 @@ export default function EquipmentList() {
 
       {filteredEquipment.length === 0 && (
         <div className="text-center py-12">
-          <Truck className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-          <p className="text-gray-600">No equipment found matching your search.</p>
+          <Truck className="h-12 w-12 text-slate-400 mx-auto mb-4" />
+          <p className="text-slate-600">
+            No equipment found matching your search.
+          </p>
         </div>
       )}
     </div>
@@ -383,22 +421,22 @@ function EquipmentCard({ equipment, onCall }) {
   const getStatusColor = (status = '') => {
     switch (norm(status)) {
       case 'active':
-        return 'bg-green-100 text-green-800';
+        return 'bg-emerald-100 text-emerald-800';
       case 'in use':
         return 'bg-blue-100 text-blue-800';
       case 'maintenance':
         return 'bg-red-100 text-red-800';
       default:
-        return 'bg-gray-100 text-gray-800';
+        return 'bg-slate-100 text-slate-800';
     }
   };
 
   return (
-    <Card className="hover:shadow-lg transition-shadow">
+    <Card className="hover:shadow-md transition-shadow border border-border bg-card">
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
-          <CardTitle className="text-lg flex items-center">
-            <Truck className="h-5 w-5 mr-2 text-blue-600" />
+          <CardTitle className="text-base flex items-center text-slate-900">
+            <Truck className="h-5 w-5 mr-2 text-primary" />
             {getName(equipment)}
           </CardTitle>
           <Badge className={getStatusColor(getStatus(equipment))}>
@@ -408,26 +446,36 @@ function EquipmentCard({ equipment, onCall }) {
       </CardHeader>
 
       <CardContent className="space-y-4">
-        <div className="bg-blue-50 p-3 rounded-lg">
+        <div className="bg-slate-50 p-3 rounded-lg">
           <div className="grid grid-cols-2 gap-2 text-sm">
             <div>
-              <p className="text-gray-600 font-medium">{t('asset_no')}</p>
-              <p className="font-bold text-blue-900">{getAsset(equipment)}</p>
+              <p className="text-slate-600 font-medium">{t('asset_no')}</p>
+              <p className="font-semibold text-slate-900">
+                {getAsset(equipment)}
+              </p>
             </div>
             <div>
-              <p className="text-gray-600 font-medium">{t('plate_serial_no')}</p>
-              <p className="font-bold text-blue-900">{getPlate(equipment)}</p>
+              <p className="text-slate-600 font-medium">
+                {t('plate_serial_no')}
+              </p>
+              <p className="font-semibold text-slate-900">
+                {getPlate(equipment)}
+              </p>
             </div>
           </div>
         </div>
 
-        <div className="bg-gray-50 p-3 rounded-lg">
-          <p className="text-gray-600 text-sm font-medium">{t('zone_department')}</p>
-          <p className="font-semibold text-gray-900">{getDept(equipment)}</p>
+        <div className="bg-slate-50 p-3 rounded-lg">
+          <p className="text-slate-600 text-sm font-medium">
+            {t('zone_department')}
+          </p>
+          <p className="font-semibold text-slate-900">{getDept(equipment)}</p>
         </div>
 
         <div className="space-y-2">
-          <p className="text-gray-600 text-sm font-medium">{t('assigned_driver')}</p>
+          <p className="text-slate-600 text-sm font-medium">
+            {t('assigned_driver')}
+          </p>
 
           {getDayDriverName(equipment) && (
             <div className="bg-yellow-50 p-3 rounded-lg">
@@ -436,13 +484,15 @@ function EquipmentCard({ equipment, onCall }) {
                   <p className="font-medium text-yellow-900">
                     {t('day_shift')}: {getDayDriverName(equipment)}
                   </p>
-                  <p className="text-sm text-yellow-700">{getDayDriverPhone(equipment)}</p>
+                  <p className="text-sm text-yellow-700">
+                    {getDayDriverPhone(equipment)}
+                  </p>
                 </div>
                 {getDayDriverPhone(equipment) && (
                   <Button
                     size="sm"
                     onClick={() => onCall(getDayDriverPhone(equipment))}
-                    className="bg-green-600 hover:bg-green-700 text-white"
+                    className="bg-emerald-600 hover:bg-emerald-700 text-white"
                   >
                     <Phone className="h-4 w-4" />
                   </Button>
@@ -458,13 +508,15 @@ function EquipmentCard({ equipment, onCall }) {
                   <p className="font-medium text-indigo-900">
                     {t('night_shift')}: {getNightDriverName(equipment)}
                   </p>
-                  <p className="text-sm text-indigo-700">{getNightDriverPhone(equipment)}</p>
+                  <p className="text-sm text-indigo-700">
+                    {getNightDriverPhone(equipment)}
+                  </p>
                 </div>
                 {getNightDriverPhone(equipment) && (
                   <Button
                     size="sm"
                     onClick={() => onCall(getNightDriverPhone(equipment))}
-                    className="bg-green-600 hover:bg-green-700 text-white"
+                    className="bg-emerald-600 hover:bg-emerald-700 text-white"
                   >
                     <Phone className="h-4 w-4" />
                   </Button>
@@ -474,27 +526,33 @@ function EquipmentCard({ equipment, onCall }) {
           )}
 
           {!getDayDriverName(equipment) && !getNightDriverName(equipment) && (
-            <div className="bg-gray-50 p-3 rounded-lg">
-              <p className="font-medium text-gray-500">{t('unassigned')}</p>
+            <div className="bg-slate-50 p-3 rounded-lg">
+              <p className="font-medium text-slate-500">{t('unassigned')}</p>
             </div>
           )}
         </div>
 
         <div className="grid grid-cols-2 gap-4 text-sm">
           <div>
-            <p className="text-gray-600">{t('shift_type')}</p>
-            <p className="font-medium">{equipment?.shift_type || ''}</p>
+            <p className="text-slate-600">{t('shift_type')}</p>
+            <p className="font-medium">
+              {equipment?.shift_type || ''}
+            </p>
           </div>
           <div>
-            <p className="text-gray-600">{t('company_supplier')}</p>
-            <p className="font-medium">{equipment?.company_supplier || ''}</p>
+            <p className="text-slate-600">{t('company_supplier')}</p>
+            <p className="font-medium">
+              {equipment?.company_supplier || ''}
+            </p>
           </div>
         </div>
 
         {equipment?.remarks && (
           <div>
-            <p className="text-gray-600 text-sm">{t('remarks')}</p>
-            <p className="font-medium">{equipment?.remarks}</p>
+            <p className="text-slate-600 text-sm">{t('remarks')}</p>
+            <p className="font-medium text-slate-800">
+              {equipment?.remarks}
+            </p>
           </div>
         )}
       </CardContent>
