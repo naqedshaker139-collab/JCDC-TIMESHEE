@@ -4,6 +4,12 @@ from flask import Flask, send_from_directory
 from flask_cors import CORS
 from src.models.equipment import db
 from src.routes.equipment import equipment_bp
+from flask_cors import CORS
+from flask_login import LoginManager
+from src.models.equipment import db
+from src.routes.equipment import equipment_bp
+from src.routes.auth import auth_bp, login_manager
+from src.routes.user import user_bp
 
 # DON'T CHANGE THIS !!!
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))

@@ -14,10 +14,9 @@ class Equipment(db.Model):
     num_shifts_requested = db.Column(db.Integer, nullable=True)
     status = db.Column(db.String(50), default='Available')
     zone_department = db.Column(db.String(100), nullable=True)
-    mobilized_date = db.Column(db.Date, nullable=True)
-    demobilization_date = db.Column(db.Date, nullable=True)
-    company_supplier = db.Column(db.String(100), nullable=True)
-    remarks = db.Column(db.String(255), nullable=True)
+    location = db.Column(db.String(255), nullable=True)
+    in_charge_name = db.Column(db.String(255), nullable=True)
+
     
     # Relationships
     day_shift_driver = db.relationship('Driver', foreign_keys='Driver.day_shift_equipment_id', backref='day_shift_assigned_equipment', lazy=True, uselist=False)

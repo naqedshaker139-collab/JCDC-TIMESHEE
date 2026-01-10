@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify
-from flask_login import LoginManager, login_user, logout_user, current_user
-
+from flask_login import LoginManager, login_user, logout_user, login_required, current_user
+from werkzeug.security import check_password_hash
 from src.models.equipment import db
 from src.models.user import User
 

@@ -15,6 +15,8 @@ const Layout = ({ children }) => {
     { name: t('drivers'), href: '/drivers' },
     { name: t('request_equipment'), href: '/request' },
     { name: t('request_history'), href: '/requests' },
+    // New: Equipment Time Card
+  { name: t('equipment_timecard'), href: '/timesheets/new' },
   ];
 
   return (

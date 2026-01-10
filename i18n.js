@@ -10,6 +10,7 @@ const resources = {
       "drivers": "Drivers",
       "request_equipment": "Request Equipment",
       "request_history": "Request History",
+      "equipment_timecard": "Equipment Time Card",
       
       // Dashboard
       "welcome": "Welcome to Equipment Management System",
@@ -97,6 +98,7 @@ const resources = {
       "drivers": "السائقين",
       "request_equipment": "طلب معدة",
       "request_history": "تاريخ الطلبات",
+      "equipment_timecard": "بطاقة تشغيل المعدات",
       
       // Dashboard
       "welcome": "مرحباً بك في نظام إدارة المعدات",
@@ -191,6 +193,7 @@ const resources = {
       "available_equipment": "可用设备",
       "total_drivers": "司机总数",
       "pending_requests": "待处理申请",
+      "equipment_timecard": "设备工时卡",
       
       // Equipment
       "asset_no": "资产编号",
