@@ -4,39 +4,60 @@ from datetime import datetime
 db = SQLAlchemy()
 
 class Equipment(db.Model):
-    __tablename__ = 'equipment'
-    
+    __tablename__ = "equipment"
+
     equipment_id = db.Column(db.Integer, primary_key=True)
-    asset_no = db.Column(db.String(50), unique=True, nullable=False)
-    equipment_name = db.Column(db.String(100), nullable=False)
-    plate_serial_no = db.Column(db.String(100), nullable=False) # Removed unique=True
-    shift_type = db.Column(db.String(50), nullable=False) # e.g., 'Day & Night', 'Day', 'Night'
+    asset_no = db.Column(db.String(64), unique=True, nullable=True)
+    equipment_name = db.Column(db.String(255), nullable=False)
+    plate_serial_no = db.Column(db.String(255), nullable=True)
+    shift_type = db.Column(db.String(32), nullable=True)
     num_shifts_requested = db.Column(db.Integer, nullable=True)
-    status = db.Column(db.String(50), default='Available')
-    zone_department = db.Column(db.String(100), nullable=True)
+    status = db.Column(db.String(64), nullable=True)
+    zone_department = db.Column(db.String(255), nullable=True)
+    company_supplier = db.Column(db.String(255), nullable=True)
     location = db.Column(db.String(255), nullable=True)
     in_charge_name = db.Column(db.String(255), nullable=True)
+    mobilized_date = db.Column(db.Date, nullable=True)
+    demobilization_date = db.Column(db.Date, nullable=True)
+    remarks = db.Column(db.String(255), nullable=True)
 
-    
     # Relationships
-    day_shift_driver = db.relationship('Driver', foreign_keys='Driver.day_shift_equipment_id', backref='day_shift_assigned_equipment', lazy=True, uselist=False)
-    night_shift_driver = db.relationship('Driver', foreign_keys='Driver.night_shift_equipment_id', backref='night_shift_assigned_equipment', lazy=True, uselist=False)
-    requests = db.relationship('Request', backref='equipment_details', lazy=True)
-    
+    day_shift_driver = db.relationship(
+        "Driver",
+        foreign_keys="Driver.day_shift_equipment_id",
+        backref="day_shift_assigned_equipment",
+        lazy=True,
+        uselist=False,
+    )
+    night_shift_driver = db.relationship(
+        "Driver",
+        foreign_keys="Driver.night_shift_equipment_id",
+        backref="night_shift_assigned_equipment",
+        lazy=True,
+        uselist=False,
+    )
+    requests = db.relationship("Request", backref="equipment_details", lazy=True)
+
     def to_dict(self):
         return {
-            'equipment_id': self.equipment_id,
-            'asset_no': self.asset_no,
-            'equipment_name': self.equipment_name,
-            'plate_serial_no': self.plate_serial_no,
-            'shift_type': self.shift_type,
-            'num_shifts_requested': self.num_shifts_requested,
-            'status': self.status,
-            'zone_department': self.zone_department,
-            'mobilized_date': self.mobilized_date.isoformat() if self.mobilized_date else None,
-            'demobilization_date': self.demobilization_date.isoformat() if self.demobilization_date else None,
-            'company_supplier': self.company_supplier,
-            'remarks': self.remarks
+            "equipment_id": self.equipment_id,
+            "asset_no": self.asset_no,
+            "equipment_name": self.equipment_name,
+            "plate_serial_no": self.plate_serial_no,
+            "shift_type": self.shift_type,
+            "num_shifts_requested": self.num_shifts_requested,
+            "status": self.status,
+            "zone_department": self.zone_department,
+            "company_supplier": self.company_supplier,
+            "location": self.location,
+            "in_charge_name": self.in_charge_name,
+            "mobilized_date": self.mobilized_date.isoformat()
+            if self.mobilized_date
+            else None,
+            "demobilization_date": self.demobilization_date.isoformat()
+            if self.demobilization_date
+            else None,
+            "remarks": self.remarks,
         }
 
 class Driver(db.Model):
