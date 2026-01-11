@@ -44,7 +44,6 @@ const getStatus = (eq) => (eq?.status ?? eq?.equipment_status ?? '').trim();
 const getAsset = (eq) => (eq?.asset_no ?? eq?.assetNo ?? '').trim();
 const getPlate = (eq) => (eq?.plate_serial_no ?? eq?.plateSerialNo ?? '').trim();
 const getLocation = (eq) => (eq?.location ?? '').trim();
-const getInCharge = (eq) => (eq?.in_charge_name ?? '').trim();
 const getDayDriverName = (eq) =>
   (eq?.day_shift_driver_name ?? eq?.dayDriverName ?? '').trim();
 const getDayDriverPhone = (eq) =>
@@ -187,7 +186,7 @@ export default function EquipmentList() {
   useEffect(() => {
     let alive = true;
     (async () => {
-      try:
+      try {
         const res = await fetch('/api/equipment', { credentials: 'include' });
         const raw = await res.json();
         const list = toArray(raw);
@@ -226,7 +225,6 @@ export default function EquipmentList() {
       norm(getAsset(eq)).includes(q) ||
       norm(getPlate(eq)).includes(q) ||
       norm(getLocation(eq)).includes(q) ||
-      norm(getInCharge(eq)).includes(q) ||
       norm(getStatus(eq)).includes(q);
 
     const matchesCategory = selectedCategory
@@ -467,14 +465,6 @@ function EquipmentCard({ equipment, onCall }) {
           <p className="font-semibold text-slate-900">
             {getLocation(equipment)}
           </p>
-          {getInCharge(equipment) && (
-            <p className="text-xs text-slate-600 mt-1">
-              {t('in_charge')}:{" "}
-              <span className="font-medium text-slate-900">
-                {getInCharge(equipment)}
-              </span>
-            </p>
-          )}
         </div>
 
         <div className="space-y-2">
