@@ -30,7 +30,7 @@ function isFriday(isoDate) {
   return d.getDay() === 5;
 }
 
-export default function TimesheetCard() {
+export default function () {
   const { id } = useParams(); // /timesheets/:id
   const navigate = useNavigate();
 
@@ -288,10 +288,10 @@ export default function TimesheetCard() {
           <div className="grid grid-cols-2">
             <div className="flex border-r border-slate-300">
               <div className="w-40 bg-amber-100 border-r border-slate-300 px-2 py-1 font-semibold">
-                CHASSIS NO
+                plate_serial_no
               </div>
               <div className="flex-1 px-2 py-1">
-                {timesheet.chassis_no || "—"}
+                {timesheet.plate_serial_no || "—"}
               </div>
             </div>
             <div className="flex">
