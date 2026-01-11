@@ -116,10 +116,11 @@ def import_data_from_excel(excel_path: str):
 
         print("Columns in sheet:", list(df.columns))
 
-        # Expected columns:
-        # 'Si No', 'equipment_name', 'plate_serial_no', 'shift_type',
+        # Expected columns now include:
+        # 'Si No', 'equipment_name', 'FLEET CODE', 'plate_serial_no',
+        # 'shift_type', 'MOBILIZATION', 'DEMOBILIZATION',
         # 'driver_name', 'driver_iqama', 'driver_phone',
-        # 'company_supplier', 'status', 'remarks'
+        # 'company_supplier', 'status', 'Location', 'In Charge Name'
 
         inserted_eq = 0
         inserted_dr_new = 0
@@ -135,12 +136,26 @@ def import_data_from_excel(excel_path: str):
             plate_no = _id_str(row.get("plate_serial_no"))
             shift_raw = row.get("shift_type")
             shift = normalize_shift(shift_raw)
+
             driver_name = _norm(row.get("driver_name"))
             driver_iqama = _id_str(row.get("driver_iqama"))
             driver_phone = _id_str(row.get("driver_phone"))
+
             supplier = _norm(row.get("company_supplier"))
             status = _norm(row.get("status"))
-            remarks = _norm(row.get("remarks"))
+
+            # NEW: read Location and In Charge Name from Excel
+            location = _norm(row.get("Location"))
+            in_charge_name = _norm(row.get("In Charge Name"))
+
+            # If you have mobilization/demobilization columns and want to use them:
+            # mobilized = parse_date(row.get("MOBILIZATION"))
+            # demobilized = parse_date(row.get("DEMOBILIZATION"))
+            mobilized = None
+            demobilized = None
+
+            # There is no "remarks" column in this new sheet; keep None unless you add one
+            remarks = None
 
             # Skip completely empty rows
             if not equipment_name and not plate_no:
@@ -160,13 +175,15 @@ def import_data_from_excel(excel_path: str):
                     asset_no=plate_no,
                     equipment_name=equipment_name,
                     plate_serial_no=plate_no,
-                    shift_type="",  # we won't rely on this for day/night; drivers carry shift info
+                    shift_type="",  # drivers carry shift info
                     num_shifts_requested=None,
                     status=status,
-                    zone_department=None,
-                    mobilized_date=None,
-                    demobilization_date=None,
+                    zone_department=None,  # no longer used; we rely on location
                     company_supplier=supplier,
+                    location=location,
+                    in_charge_name=in_charge_name,
+                    mobilized_date=mobilized,
+                    demobilization_date=demobilized,
                     remarks=remarks,
                 )
                 db.session.add(eq)
@@ -174,11 +191,15 @@ def import_data_from_excel(excel_path: str):
                 equipment_by_plate[plate_no] = eq
                 inserted_eq += 1
             else:
-                # Optionally update status/supplier/remarks from later rows
+                # Optionally update status/supplier/location/in_charge/remarks from later rows
                 if status:
                     eq.status = status
                 if supplier:
                     eq.company_supplier = supplier
+                if location:
+                    eq.location = location
+                if in_charge_name:
+                    eq.in_charge_name = in_charge_name
                 if remarks:
                     eq.remarks = remarks
 
@@ -218,11 +239,8 @@ def import_data_from_excel(excel_path: str):
             if driver_obj:
                 if shift in ("DAY", "BOTH"):
                     driver_obj.day_shift_equipment_id = eq.equipment_id
-                if shift in ("NIGHT", "BOTH") or shift == "":
-                    # If shift is unknown/empty, we can treat as day only;
-                    # here we only set NIGHT when we explicitly see NIGHT/BOTH.
-                    if shift in ("NIGHT", "BOTH"):
-                        driver_obj.night_shift_equipment_id = eq.equipment_id
+                if shift in ("NIGHT", "BOTH"):
+                    driver_obj.night_shift_equipment_id = eq.equipment_id
 
         db.session.commit()
         print(f"Inserted Equipment rows: {inserted_eq}")
