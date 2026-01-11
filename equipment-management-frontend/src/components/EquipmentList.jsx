@@ -43,7 +43,7 @@ const getName = (eq) => (eq?.equipment_name ?? eq?.name ?? '').trim();
 const getStatus = (eq) => (eq?.status ?? eq?.equipment_status ?? '').trim();
 const getAsset = (eq) => (eq?.asset_no ?? eq?.assetNo ?? '').trim();
 const getPlate = (eq) => (eq?.plate_serial_no ?? eq?.plateSerialNo ?? '').trim();
-const getDept = (eq) => (eq?.zone_department ?? eq?.department ?? '').trim();
+const getLocation = (eq) => (eq?.location ?? '').trim();
 const getDayDriverName = (eq) =>
   (eq?.day_shift_driver_name ?? eq?.dayDriverName ?? '').trim();
 const getDayDriverPhone = (eq) =>
@@ -90,12 +90,7 @@ export default function EquipmentList() {
       icon: Loader,
       iconBg: 'bg-orange-100',
       iconText: 'text-orange-700',
-      keywords: [
-        'backhoe loader',
-        'skid steel loader',
-        'wheel loader',
-        'loader',
-      ],
+      keywords: ['backhoe loader', 'skid steel loader', 'wheel loader', 'loader'],
     },
     {
       id: 'rollers',
@@ -229,7 +224,7 @@ export default function EquipmentList() {
       norm(getName(eq)).includes(q) ||
       norm(getAsset(eq)).includes(q) ||
       norm(getPlate(eq)).includes(q) ||
-      norm(getDept(eq)).includes(q) ||
+      norm(getLocation(eq)).includes(q) ||
       norm(getStatus(eq)).includes(q);
 
     const matchesCategory = selectedCategory
@@ -306,9 +301,7 @@ export default function EquipmentList() {
                     <div
                       className={`w-10 h-10 rounded-full flex items-center justify-center ${category.iconBg}`}
                     >
-                      <Icon
-                        className={`h-5 w-5 ${category.iconText}`}
-                      />
+                      <Icon className={`h-5 w-5 ${category.iconText}`} />
                     </div>
                     <div className="flex-1">
                       <h3 className="font-semibold text-sm text-slate-900">
@@ -467,9 +460,11 @@ function EquipmentCard({ equipment, onCall }) {
 
         <div className="bg-slate-50 p-3 rounded-lg">
           <p className="text-slate-600 text-sm font-medium">
-            {t('zone_department')}
+            {t('location')}
           </p>
-          <p className="font-semibold text-slate-900">{getDept(equipment)}</p>
+          <p className="font-semibold text-slate-900">
+            {getLocation(equipment)}
+          </p>
         </div>
 
         <div className="space-y-2">
