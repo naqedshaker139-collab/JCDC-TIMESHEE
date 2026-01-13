@@ -24,9 +24,9 @@ export default function Login() {
     setError('');
 
     try {
+      // This will accept JCDCCRCC / 2034 if you created that user in the backend
       await api.post('/auth/login', { username, password });
-      // On success, go to dashboard
-      navigate('/');
+      navigate('/'); // Go to dashboard on success
     } catch (err) {
       console.error('Login failed:', err);
       const msg =

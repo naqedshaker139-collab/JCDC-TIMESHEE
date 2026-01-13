@@ -21,28 +21,23 @@ function App() {
 
   return (
     <Router>
-      <Routes>
-        {/* Public login route WITHOUT layout */}
-        <Route path="/login" element={<Login />} />
+      <Layout>
+        <Routes>
+          {/* Login page */}
+          <Route path="/login" element={<Login />} />
 
-        {/* All other routes WITH main layout */}
-        <Route
-          path="/*"
-          element={
-            <Layout>
-              <Routes>
-                <Route path="/" element={<Dashboard />} />
-                <Route path="/equipment" element={<EquipmentList />} />
-                <Route path="/drivers" element={<DriverList />} />
-                <Route path="/request" element={<RequestForm />} />
-                <Route path="/requests" element={<RequestHistory />} />
-                <Route path="/timesheets/new" element={<TimesheetLauncher />} />
-                <Route path="/timesheets/:id" element={<TimesheetCard />} />
-              </Routes>
-            </Layout>
-          }
-        />
-      </Routes>
+          {/* Existing routes */}
+          <Route path="/" element={<Dashboard />} />
+          <Route path="/equipment" element={<EquipmentList />} />
+          <Route path="/drivers" element={<DriverList />} />
+          <Route path="/request" element={<RequestForm />} />
+          <Route path="/requests" element={<RequestHistory />} />
+
+          {/* Timesheet routes */}
+          <Route path="/timesheets/new" element={<TimesheetLauncher />} />
+          <Route path="/timesheets/:id" element={<TimesheetCard />} />
+        </Routes>
+      </Layout>
     </Router>
   );
 }
