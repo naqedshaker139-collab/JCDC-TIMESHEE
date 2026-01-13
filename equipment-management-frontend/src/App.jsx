@@ -6,8 +6,9 @@ import EquipmentList from './components/EquipmentList';
 import DriverList from './components/DriverList';
 import RequestForm from './components/RequestForm';
 import RequestHistory from './components/RequestHistory';
-import TimesheetLauncher from './pages/TimesheetLauncher';   // NEW
-import TimesheetCard from './pages/TimesheetCard';           // NEW
+import TimesheetLauncher from './pages/TimesheetLauncher';
+import TimesheetCard from './pages/TimesheetCard';
+import Login from './pages/Login'; // NEW
 import './api'; // Configure axios
 import './i18n';
 import './App.css';
@@ -20,20 +21,28 @@ function App() {
 
   return (
     <Router>
-      <Layout>
-        <Routes>
-          {/* Existing routes */}
-          <Route path="/" element={<Dashboard />} />
-          <Route path="/equipment" element={<EquipmentList />} />
-          <Route path="/drivers" element={<DriverList />} />
-          <Route path="/request" element={<RequestForm />} />
-          <Route path="/requests" element={<RequestHistory />} />
+      <Routes>
+        {/* Public login route WITHOUT layout */}
+        <Route path="/login" element={<Login />} />
 
-          {/* NEW timesheet routes */}
-          <Route path="/timesheets/new" element={<TimesheetLauncher />} />
-          <Route path="/timesheets/:id" element={<TimesheetCard />} />
-        </Routes>
-      </Layout>
+        {/* All other routes WITH main layout */}
+        <Route
+          path="/*"
+          element={
+            <Layout>
+              <Routes>
+                <Route path="/" element={<Dashboard />} />
+                <Route path="/equipment" element={<EquipmentList />} />
+                <Route path="/drivers" element={<DriverList />} />
+                <Route path="/request" element={<RequestForm />} />
+                <Route path="/requests" element={<RequestHistory />} />
+                <Route path="/timesheets/new" element={<TimesheetLauncher />} />
+                <Route path="/timesheets/:id" element={<TimesheetCard />} />
+              </Routes>
+            </Layout>
+          }
+        />
+      </Routes>
     </Router>
   );
 }
