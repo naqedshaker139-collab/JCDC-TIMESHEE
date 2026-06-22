@@ -1,0 +1,43 @@
+# Render manifest configuring two services: backend (Python/Flask) and frontend (Vite static site)
+services:
+  - type: web
+    name: equipment-management-backend
+    env: python
+    branch: main
+    buildCommand: pip install -r equipment-management-backend/requirements.txt
+    startCommand: gunicorn -w 4 -b 0.0.0.0:$PORT src.main:app
+    envVars:
+      - key: DATABASE_URL
+        # Set this in Render dashboard (or remove to use an external DB)
+        value: ""
+      - key: SECRET_KEY
+        value: ""
+
+  - type: static_site
+    name: equipment-management-frontend
+    env: node
+    branch: main
+    buildCommand: pnpm --prefix equipment-management-frontend install && pnpm --prefix equipment-management-frontend run build
+    publishPath: equipment-management-frontend/dist
+services:
+  - type: web
+    name: jcdc-app
+    env: python
+
+    buildCommand: |
+      pip install -r requirements.txt
+      corepack enable || true
+      cd equipment-management-frontend
+      pnpm install
+      pnpm build
+      cd ..
+      mkdir -p static
+      cp -R equipment-management-frontend/dist/* static/ || true
+
+    startCommand: gunicorn wsgi:app -w 3 -k gthread -b 0.0.0.0:$PORT --timeout 120
+
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.9
+      - key: SECRET_KEY
+        generateValue: true
